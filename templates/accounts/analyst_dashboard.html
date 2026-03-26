@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="dashboard-container">
+
+    <h1 class="page-title">🧠 My Investigation Queue</h1>
+
+    <!-- STAT CARDS -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <span>Total</span>
+            <h2>{{ total_count }}</h2>
+        </div>
+
+        <div class="stat-card open">
+            <span>Open</span>
+            <h2>{{ open_count }}</h2>
+        </div>
+
+        <div class="stat-card progress">
+            <span>In Progress</span>
+            <h2>{{ progress_count }}</h2>
+        </div>
+
+        <div class="stat-card resolved">
+            <span>Resolved</span>
+            <h2>{{ resolved_count }}</h2>
+        </div>
+
+        <div class="stat-card closed">
+            <span>Closed</span>
+            <h2>{{ closed_count }}</h2>
+        </div>
+    </div>
+
+
+    <!-- INCIDENT LIST -->
+    <div class="incident-grid">
+
+        {% for incident in assigned_incidents %}
+        <div class="incident-card">
+
+            <div class="card-header">
+                <span class="ticket-id">#{{ incident.id }}</span>
+
+                <span class="status-badge {{ incident.status|lower }}">
+                    {{ incident.status }}
+                </span>
+            </div>
+
+            <h3 class="incident-title">{{ incident.title }}</h3>
+            <p class="incident-desc">{{ incident.description }}</p>
+
+            <div class="card-footer">
+                <span class="priority {{ incident.priority|lower }}">
+                    Priority: {{ incident.priority }}
+                </span>
+
+                <span class="created">
+                    Created: {{ incident.created_at|timesince }} ago
+                </span>
+            </div>
+
+        </div>
+        {% empty %}
+        <p>No assigned incidents</p>
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}

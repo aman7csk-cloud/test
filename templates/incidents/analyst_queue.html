@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="queue-container">
+
+    <h2 class="queue-title">🧠 My Investigation Queue</h2>
+
+    {% for incident in incidents %}
+    <div class="ticket">
+
+        <div class="ticket-top">
+            <span class="ticket-id">#{{ incident.id }}</span>
+            <span class="ticket-status {{ incident.status|lower }}">
+                {{ incident.status }}
+            </span>
+        </div>
+
+        <h3>{{ incident.title }}</h3>
+
+        <p>{{ incident.description|truncatewords:18 }}</p>
+
+        <div class="ticket-meta">
+            <span>Priority: <b>{{ incident.priority }}</b></span>
+            <span>Created: {{ incident.created_at|timesince }} ago</span>
+        </div>
+
+        <div class="ticket-actions">
+            <a href="{% url 'incidents:incident_detail' incident.id %}" class="btn view">Open</a>
+        </div>
+
+    </div>
+    {% empty %}
+        <p class="empty">No assigned incidents 🎉</p>
+    {% endfor %}
+
+</div>
+
+<style>
+
+.queue-container{
+max-width:1100px;margin:auto;padding:30px;
+}
+
+.queue-title{
+text-align:center;font-size:28px;font-weight:700;margin-bottom:25px;
+}
+
+.ticket{
+background:white;border-radius:16px;padding:18px;margin-bottom:18px;
+box-shadow:0 8px 25px rgba(0,0,0,.08);
+transition:.25s;
+}
+
+.ticket:hover{
+transform:translateY(-4px);
+box-shadow:0 15px 40px rgba(0,0,0,.15);
+}
+
+.ticket-top{
+display:flex;justify-content:space-between;margin-bottom:8px;
+}
+
+.ticket-status{
+padding:4px 10px;border-radius:999px;font-size:12px;color:white;
+}
+
+.assigned{background:#7c3aed;}
+.in_progress{background:#f59e0b;}
+.resolved{background:#16a34a;}
+
+.ticket-meta{
+display:flex;justify-content:space-between;color:#6b7280;font-size:13px;margin-top:10px;
+}
+
+.btn.view{
+background:#4f46e5;color:white;padding:8px 14px;border-radius:10px;text-decoration:none;
+}
+
+.empty{text-align:center;color:gray;margin-top:40px}
+
+</style>
+
+{% endblock %}
+

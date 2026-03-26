@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+/* Dashboard Layout */
+.dashboard-wrapper {
+    padding: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Stats Cards Section */
+.stats-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    padding: 25px;
+    border-radius: 14px;
+    color: white;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+    transition: 0.3s ease;
+    text-align: center;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Gradients matching your design */
+.card-blue { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+.card-orange { background: linear-gradient(135deg, #f6d365, #fda085); }
+.card-green { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+
+.stat-label { font-size: 0.9rem; font-weight: 600; opacity: 0.9; text-transform: uppercase; }
+.stat-number { font-size: 2.5rem; margin: 10px 0; font-weight: 700; }
+
+/* Incident Box */
+.incident-box {
+    background: white;
+    padding: 25px;
+    border-radius: 14px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.box-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #f8f9fa;
+    padding-bottom: 10px;
+}
+
+.incident-item {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.id-tag { color: #888; font-weight: bold; margin-right: 10px; }
+.title-link { text-decoration: none; color: #333; font-weight: 500; }
+.title-link:hover { color: #4facfe; }
+
+/* Status Pills */
+.status-pill {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: white;
+}
+
+/* Status Colors */
+.open { background-color: #ff9800; }
+.in_progress { background-color: #2196f3; }
+.resolved { background-color: #4caf50; }
+.closed { background-color: #9e9e9e; }
+
+.empty-state { text-align: center; padding: 40px; color: #888; }
+.badge { background: #f1f5f9; color: #475569; padding: 5px 12px; border-radius: 15px; font-size: 0.8rem; }
+</style>
+
+<div class="dashboard-wrapper">
+    <h2>👤 My Dashboard</h2>
+
+    <div class="stats-container">
+        <div class="stat-card card-blue">
+            <span class="stat-label">Open</span>
+            <h2 class="stat-number">{{ open_count }}</h2>
+        </div>
+
+        <div class="stat-card card-orange">
+            <span class="stat-label">In Progress</span>
+            <h2 class="stat-number">{{ progress_count }}</h2>
+        </div>
+
+        <div class="stat-card card-green">
+            <span class="stat-label">Resolved</span>
+            <h2 class="stat-number">{{ resolved_count }}</h2>
+        </div>
+    </div>
+
+    <div class="incident-box">
+        <div class="box-header">
+            <h3>📋 My Reported Incidents</h3>
+            <span class="badge">{{ total_count }} Total</span>
+        </div>
+
+        <div class="incident-list">
+            {% for incident in my_incidents %}
+                <div class="incident-item">
+                    <div class="incident-info">
+                        <span class="id-tag">#{{ incident.id }}</span>
+                        <a href="{% url 'incidents:incident_detail' incident.pk %}" class="title-link">
+                            {{ incident.title }}
+                        </a>
+                    </div>
+                    <div class="status-pill {{ incident.status|lower }}">
+                        {{ incident.status }}
+                    </div>
+                </div>
+            {% empty %}
+                <div class="empty-state">
+                    <p>You haven't created any incidents yet.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+.dashboard{
+    max-width:1200px;
+    margin:auto;
+    padding:20px;
+    font-family:system-ui;
+}
+
+/* HEADER */
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
+}
+.header h2{
+    margin:0;
+}
+
+/* STAT CARDS */
+.stats{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:20px;
+    margin-bottom:30px;
+}
+.card{
+    padding:18px;
+    border-radius:14px;
+    color:white;
+    box-shadow:0 8px 20px rgba(0,0,0,0.15);
+}
+.total{background:#4f46e5;}
+.open{background:#2563eb;}
+.progress{background:#f59e0b;}
+.resolved{background:#16a34a;}
+.closed{background:#374151;}
+
+.card h3{margin:0;font-size:28px;}
+.card p{margin:0;font-size:14px;opacity:.9}
+
+/* TABLE */
+.table{
+    width:100%;
+    border-collapse:collapse;
+    background:white;
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:0 6px 18px rgba(0,0,0,0.1);
+}
+.table th,.table td{
+    padding:12px;
+    border-bottom:1px solid #eee;
+    text-align:left;
+}
+.table th{background:#f1f5f9;}
+
+.overdue{
+    color:red;
+    font-weight:bold;
+}
+
+/* LOG BOX */
+.log-box{
+    margin-top:30px;
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.1);
+}
+</style>
+
+<div class="dashboard">
+
+    <div class="header">
+        <h2>🛠 Admin Control Panel</h2>
+        <span>System Health: ✅ Active</span>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats">
+        <div class="card total"><p>Total</p><h3>{{ total_count }}</h3></div>
+        <div class="card open"><p>Open</p><h3>{{ open_count }}</h3></div>
+        <div class="card progress"><p>In Progress</p><h3>{{ progress_count }}</h3></div>
+        <div class="card resolved"><p>Resolved</p><h3>{{ resolved_count }}</h3></div>
+        <div class="card closed"><p>Closed</p><h3>{{ closed_count }}</h3></div>
+    </div>
+
+    <!-- RECENT INCIDENTS -->
+    <h3>📋 Recent Incidents</h3>
+    <table class="table">
+        <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>User</th>
+            <th>Assigned</th>
+            <th>Status</th>
+            <th>SLA</th>
+        </tr>
+
+        {% for incident in recent_incidents %}
+        <tr>
+            <td>#{{ incident.id }}</td>
+            <td>{{ incident.title }}</td>
+            <td>{{ incident.created_by.username }}</td>
+            <td>
+                {% if incident.assigned_to %}
+                    {{ incident.assigned_to.username }}
+                {% else %}
+                    Unassigned
+                {% endif %}
+            </td>
+            <td>{{ incident.status }}</td>
+            <td>
+                {% if incident in overdue_incidents %}
+                    <span class="overdue">Overdue</span>
+                {% else %}
+                    OK
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6">No incidents yet</td></tr>
+        {% endfor %}
+    </table>
+
+    <!-- ACTIVITY LOG -->
+    <div class="log-box">
+        <h3>🕘 Latest Activity</h3>
+        <ul>
+        {% for log in recent_logs %}
+            <li>
+                #{{ log.incident.id }} changed {{ log.old_status }} → {{ log.new_status }}
+                by <b>{{ log.changed_by.username }}</b>
+            </li>
+        {% empty %}
+            <li>No activity yet</li>
+        {% endfor %}
+        </ul>
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,61 @@
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Incident System</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+```
+{% load static %}
+
+<!-- Global CSS -->
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+<!-- Page specific CSS -->
+{% block extra_css %}{% endblock %}
+```
+
+</head>
+<body>
+
+```
+<!-- NAVBAR -->
+<div class="topbar">
+    <div class="topbar-left">
+        <strong>Incident Management</strong>
+    </div>
+
+    <div class="topbar-right">
+        {% if request.user.is_authenticated %}
+            <span class="welcome">Welcome {{ request.user.username }} 👋</span>
+
+            <a href="{% url 'incidents:create_incident' %}" class="create-btn">
+                ➕ Create New Incident
+            </a>
+                {% if request.user.role == "admin" %}
+            <a href="{% url 'assign_analyst_role' %}" class="nav-btn admin-btn">
+            👤 Manage Analysts
+        </a>
+            {% endif %}
+            <!-- ✅ CORRECT LOGOUT -->
+            <form action="{% url 'logout' %}" method="POST" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="logout-btn">Logout</button>
+            </form>
+        {% endif %}
+    </div>
+</div>
+
+{% block content %}{% endblock %}
+{% if user.role == "analyst" %}
+<a href="{% url 'incidents:analyst_queue' %}">My Queue</a>
+{% endif %}
+
+```
+
+</body>
+</html>
+
+

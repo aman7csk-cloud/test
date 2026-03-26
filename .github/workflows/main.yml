@@ -1,4 +1,3 @@
-## \\ CI/CD Pipeline for Django to AWS Elastic Beanstalk #
 name: CI/CD Pipeline to AWS Elastic Beanstalk deploy
 
 on:
@@ -12,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
+        # Step 1: Fix this to match your folder exactly or rename the folder
         working-directory: ./incident-management_!
     steps:
       - name: Checkout Repository
@@ -32,6 +32,7 @@ jobs:
       - name: Run Pylint
         run: |
           export PYTHONPATH=$PYTHONPATH:$(pwd)
+          # We use quotes around the find command to handle the '!' in the directory path
           pylint $(find . -name "*.py" -not -path "*/venv/*" -not -path "*/migrations/*") \
           --load-plugins pylint_django \
           --django-settings-module=config.settings \
@@ -56,7 +57,7 @@ jobs:
           args: >
             -Dsonar.projectKey=aman7csk-cloud_incident-management
             -Dsonar.organization=aman7csk-cloud
-            -Dsonar.sources=incident-management
+            -Dsonar.sources=incident-management_!
             -Dsonar.python.version=3.11
             -Dsonar.exclusions=**/migrations/**,**/venv/**,**/.c9/**
 
@@ -67,7 +68,7 @@ jobs:
     needs: [lint, sonarqube] 
     defaults:
       run:
-        working-directory: ./incident-management
+        working-directory: ./incident-management_!
 
     steps:
       - name: Checkout Repository
@@ -83,12 +84,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # Generates the staticfiles/ directory so CSS/JS works in production
       - name: Collect Static Files
         run: python manage.py collectstatic --noinput
 
       - name: Generate Deployment Package
-        run: zip -r deploy.zip . -x "*.git*" "venv/*" ".c9/*"
+        # Added db.sqlite3 to exclusions to prevent overwriting production data
+        run: zip -r deploy.zip . -x "*.git*" "venv/*" ".c9/*" "db.sqlite3"
 
       - name: Deploy to AWS Elastic Beanstalk
         uses: einaregilsson/beanstalk-deploy@v21
@@ -100,9 +101,6 @@ jobs:
           environment_name: "Incidentmanagement-env-1" 
           region: "us-east-1"
           version_label: "app-${{ github.sha }}"
-          # CRITICAL FIX: The action needs the full path from the repo root
-          deployment_package: "incident-management/deploy.zip" 
+          # CRITICAL: This path must match your working directory exactly
+          deployment_package: "incident-management_!/deploy.zip" 
           use_existing_version_if_available: true
-
-
-# \\ CI/CD Pipeline for Django to AWS Elastic Beanstalk #
